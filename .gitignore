@@ -1,0 +1,57 @@
+# Unity generated folders
+Library/
+Temp/
+Obj/
+Logs/
+UserSettings/
+
+# Unity build outputs
+Build/
+Builds/
+
+# Unity generated solution and project files
+*.csproj
+*.sln
+*.suo
+*.tmp
+*.user
+*.userprefs
+*.pidb
+*.booproj
+*.svd
+*.pdb
+*.mdb
+*.opendb
+*.VC.db
+
+# Unity crash and memory captures
+sysinfo.txt
+*.stackdump
+MemoryCaptures/
+
+# Rider and Visual Studio
+.idea/
+.vs/
+
+# VS Code local settings
+.vscode/
+
+# Python caches and virtual environments
+__pycache__/
+__pycache__.meta
+*.py[cod]
+*.py[cod].meta
+.pytest_cache/
+.venv/
+venv/
+
+# Local Roslyn gateway execution scratch files
+tmp_do_code.csx
+tmp_do_code.csx.meta
+
+# AI workflow artifacts
+artifacts/ai-runs/
+
+# Local worktrees
+.worktrees/
+worktrees/

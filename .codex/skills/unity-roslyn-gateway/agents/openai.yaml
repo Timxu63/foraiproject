@@ -1,0 +1,4 @@
+﻿interface:
+  display_name: "Unity Roslyn 网关"
+  short_description: "通过单中心 Roslyn 网关稳定执行 Unity Editor 代码"
+  default_prompt: "使用本技能通过 Packages/com.forai.roslyn-gateway/Python~/ai_gateway_client.py 操作 Unity Editor。若可能有多个 Unity 在线，先 list-unities，并用 --project-root 指定目标；只有单 Unity 在线时可直接 do-code。查询信息时优先使用 return 返回值。"

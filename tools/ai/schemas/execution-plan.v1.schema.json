@@ -1,0 +1,44 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://forai.local/schemas/execution-plan.v1.schema.json",
+  "title": "ExecutionPlanV1",
+  "type": "object",
+  "required": ["version", "runId", "steps"],
+  "additionalProperties": false,
+  "properties": {
+    "version": {
+      "const": "execution-plan/v1"
+    },
+    "runId": {
+      "type": "string",
+      "minLength": 1
+    },
+    "steps": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "required": ["id", "kind", "description", "target", "requiresConfirmation"],
+        "additionalProperties": false,
+        "properties": {
+          "id": {
+            "type": "string",
+            "minLength": 1
+          },
+          "kind": {
+            "enum": ["read_only", "cli", "unity_adapter", "validation"]
+          },
+          "description": {
+            "type": "string",
+            "minLength": 1
+          },
+          "target": {
+            "type": "string"
+          },
+          "requiresConfirmation": {
+            "type": "boolean"
+          }
+        }
+      }
+    }
+  }
+}

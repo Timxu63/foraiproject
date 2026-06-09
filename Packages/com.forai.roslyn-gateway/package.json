@@ -1,0 +1,10 @@
+{
+  "name": "com.forai.roslyn-gateway",
+  "version": "0.1.0",
+  "displayName": "ForAI Roslyn Gateway",
+  "description": "Unity Editor gateway for AI-assisted Roslyn execution and project automation.",
+  "unity": "2022.3",
+  "author": {
+    "name": "ForAI"
+  }
+}

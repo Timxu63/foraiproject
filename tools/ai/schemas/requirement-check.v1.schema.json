@@ -1,0 +1,51 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://forai.local/schemas/requirement-check.v1.schema.json",
+  "title": "RequirementCheckV1",
+  "type": "object",
+  "required": ["version", "status", "questions", "defaults", "blockers"],
+  "additionalProperties": false,
+  "properties": {
+    "version": {
+      "const": "requirement-check/v1"
+    },
+    "status": {
+      "enum": ["ready", "needs_clarification", "defaultable", "blocked"]
+    },
+    "questions": {
+      "type": "array",
+      "items": {
+        "type": "string",
+        "minLength": 1
+      }
+    },
+    "defaults": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "required": ["field", "value", "reason"],
+        "additionalProperties": false,
+        "properties": {
+          "field": {
+            "type": "string",
+            "minLength": 1
+          },
+          "value": {
+            "type": "string"
+          },
+          "reason": {
+            "type": "string",
+            "minLength": 1
+          }
+        }
+      }
+    },
+    "blockers": {
+      "type": "array",
+      "items": {
+        "type": "string",
+        "minLength": 1
+      }
+    }
+  }
+}

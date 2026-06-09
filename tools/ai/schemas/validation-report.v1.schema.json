@@ -1,0 +1,40 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://forai.local/schemas/validation-report.v1.schema.json",
+  "title": "ValidationReportV1",
+  "type": "object",
+  "required": ["version", "runId", "status", "checks"],
+  "additionalProperties": false,
+  "properties": {
+    "version": {
+      "const": "validation-report/v1"
+    },
+    "runId": {
+      "type": "string",
+      "minLength": 1
+    },
+    "status": {
+      "enum": ["passed", "failed", "blocked"]
+    },
+    "checks": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "required": ["name", "status", "evidence"],
+        "additionalProperties": false,
+        "properties": {
+          "name": {
+            "type": "string",
+            "minLength": 1
+          },
+          "status": {
+            "enum": ["passed", "failed", "skipped", "blocked"]
+          },
+          "evidence": {
+            "type": "string"
+          }
+        }
+      }
+    }
+  }
+}

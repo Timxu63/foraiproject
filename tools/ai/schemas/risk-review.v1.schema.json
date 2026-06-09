@@ -1,0 +1,40 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://forai.local/schemas/risk-review.v1.schema.json",
+  "title": "RiskReviewV1",
+  "type": "object",
+  "required": ["version", "runId", "overallRisk", "findings", "confirmationRequired"],
+  "additionalProperties": false,
+  "properties": {
+    "version": {
+      "const": "risk-review/v1"
+    },
+    "runId": {
+      "type": "string",
+      "minLength": 1
+    },
+    "overallRisk": {
+      "enum": ["low", "medium", "high", "blocked"]
+    },
+    "findings": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "required": ["risk", "message"],
+        "additionalProperties": false,
+        "properties": {
+          "risk": {
+            "enum": ["low", "medium", "high", "blocked"]
+          },
+          "message": {
+            "type": "string",
+            "minLength": 1
+          }
+        }
+      }
+    },
+    "confirmationRequired": {
+      "type": "boolean"
+    }
+  }
+}

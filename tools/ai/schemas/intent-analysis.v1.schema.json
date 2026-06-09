@@ -1,0 +1,49 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://forai.local/schemas/intent-analysis.v1.schema.json",
+  "title": "IntentAnalysisV1",
+  "type": "object",
+  "required": ["version", "goal", "domain", "requestedChanges", "constraints", "unknowns", "riskHints"],
+  "additionalProperties": false,
+  "properties": {
+    "version": {
+      "const": "intent-analysis/v1"
+    },
+    "goal": {
+      "type": "string",
+      "minLength": 1
+    },
+    "domain": {
+      "type": "string",
+      "minLength": 1
+    },
+    "requestedChanges": {
+      "type": "array",
+      "items": {
+        "type": "string",
+        "minLength": 1
+      }
+    },
+    "constraints": {
+      "type": "array",
+      "items": {
+        "type": "string",
+        "minLength": 1
+      }
+    },
+    "unknowns": {
+      "type": "array",
+      "items": {
+        "type": "string",
+        "minLength": 1
+      }
+    },
+    "riskHints": {
+      "type": "array",
+      "items": {
+        "type": "string",
+        "minLength": 1
+      }
+    }
+  }
+}

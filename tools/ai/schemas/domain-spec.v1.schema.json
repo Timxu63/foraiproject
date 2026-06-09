@@ -1,0 +1,45 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://forai.local/schemas/domain-spec.v1.schema.json",
+  "title": "DomainSpecV1",
+  "type": "object",
+  "required": ["version", "goal", "objects", "acceptanceCriteria"],
+  "additionalProperties": false,
+  "properties": {
+    "version": {
+      "const": "domain-spec/v1"
+    },
+    "goal": {
+      "type": "string",
+      "minLength": 1
+    },
+    "objects": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "required": ["type", "path", "properties"],
+        "additionalProperties": false,
+        "properties": {
+          "type": {
+            "type": "string",
+            "minLength": 1
+          },
+          "path": {
+            "type": "string",
+            "minLength": 1
+          },
+          "properties": {
+            "type": "object"
+          }
+        }
+      }
+    },
+    "acceptanceCriteria": {
+      "type": "array",
+      "items": {
+        "type": "string",
+        "minLength": 1
+      }
+    }
+  }
+}

@@ -1,0 +1,59 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://forai.local/schemas/unity-execution.v1.schema.json",
+  "title": "UnityExecutionV1",
+  "type": "object",
+  "required": ["version", "runId", "requestId", "success", "state", "target", "diagnostics"],
+  "additionalProperties": false,
+  "properties": {
+    "version": {
+      "const": "unity-execution/v1"
+    },
+    "runId": {
+      "type": "string",
+      "minLength": 1
+    },
+    "requestId": {
+      "type": "string",
+      "minLength": 1
+    },
+    "success": {
+      "type": "boolean"
+    },
+    "state": {
+      "enum": ["Success", "CompileError", "SecurityCheck", "RuntimeError", "Timeout", "Offline", "BusyRejected", "ClientError"]
+    },
+    "target": {
+      "type": "object",
+      "required": ["projectRoot", "unityId"],
+      "additionalProperties": false,
+      "properties": {
+        "projectRoot": {
+          "type": ["string", "null"]
+        },
+        "unityId": {
+          "type": ["string", "null"]
+        }
+      }
+    },
+    "diagnostics": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "required": ["severity", "code", "message"],
+        "additionalProperties": false,
+        "properties": {
+          "severity": {
+            "enum": ["Info", "Warning", "Error"]
+          },
+          "code": {
+            "type": "string"
+          },
+          "message": {
+            "type": "string"
+          }
+        }
+      }
+    }
+  }
+}

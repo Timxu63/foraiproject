@@ -1,0 +1,62 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://forai.local/schemas/context-pack.v1.schema.json",
+  "title": "ContextPackV1",
+  "type": "object",
+  "required": ["version", "projectRoot", "unityVersion", "packages", "paths", "summaries"],
+  "additionalProperties": false,
+  "properties": {
+    "version": {
+      "const": "context-pack/v1"
+    },
+    "projectRoot": {
+      "type": "string",
+      "minLength": 1
+    },
+    "unityVersion": {
+      "type": "string"
+    },
+    "packages": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "required": ["name", "version"],
+        "additionalProperties": false,
+        "properties": {
+          "name": {
+            "type": "string",
+            "minLength": 1
+          },
+          "version": {
+            "type": "string"
+          }
+        }
+      }
+    },
+    "paths": {
+      "type": "array",
+      "items": {
+        "type": "string",
+        "minLength": 1
+      }
+    },
+    "summaries": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "required": ["source", "summary"],
+        "additionalProperties": false,
+        "properties": {
+          "source": {
+            "type": "string",
+            "minLength": 1
+          },
+          "summary": {
+            "type": "string",
+            "minLength": 1
+          }
+        }
+      }
+    }
+  }
+}
