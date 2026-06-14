@@ -11,6 +11,8 @@ Execute plan by dispatching fresh subagent per task, with two-stage review after
 
 **Core principle:** Fresh subagent per task + two-stage review (spec then quality) = high quality, fast iteration
 
+**Git topology exception:** Continuous execution does not apply to branch or worktree changes. Before creating, entering, removing, or switching a branch/worktree, stop and get the user's explicit choice in the current conversation. Plan approval and this skill's recommendation are not consent.
+
 **Continuous execution:** Do not pause to check in with your human partner between tasks. Execute all tasks from the plan without stopping. The only reasons to stop are: BLOCKED status you cannot resolve, ambiguity that genuinely prevents progress, or all tasks complete. "Should I continue?" prompts and progress summaries waste their time — they asked you to execute the plan, so execute it.
 
 ## When to Use
@@ -237,6 +239,8 @@ Done!
 
 **Never:**
 - Start implementation on main/master branch without explicit user consent
+- Create, enter, remove, or switch a branch/worktree without explicit user choice in the current conversation
+- Start parallel work in separate worktrees without explicit user choice
 - Skip reviews (spec compliance OR code quality)
 - Proceed with unfixed issues
 - Dispatch multiple implementation subagents in parallel (conflicts)
@@ -267,7 +271,7 @@ Done!
 ## Integration
 
 **Required workflow skills:**
-- **superpowers:using-git-worktrees** - Ensures isolated workspace (creates one or verifies existing)
+- **superpowers:using-git-worktrees** - Ensures isolated workspace only after explicit user git-topology choice
 - **superpowers:writing-plans** - Creates the plan this skill executes
 - **superpowers:requesting-code-review** - Code review template for reviewer subagents
 - **superpowers:finishing-a-development-branch** - Complete development after all tasks

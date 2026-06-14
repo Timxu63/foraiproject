@@ -1,0 +1,38 @@
+{
+  "version": "execution-plan/v1",
+  "runId": "example-low-risk",
+  "steps": [
+    {
+      "id": "read-ai-docs",
+      "kind": "read_only",
+      "description": "Read AI workflow documentation.",
+      "target": "docs/ai/workflows.md",
+      "command": "",
+      "inputs": {},
+      "outputs": [],
+      "dryRunSupported": true,
+      "validation": [],
+      "requiresConfirmation": false
+    },
+    {
+      "id": "validate-context-pack",
+      "kind": "validation",
+      "description": "Validate generated context pack against context-pack/v1.",
+      "target": "artifacts/ai-runs/example-low-risk/context-pack.json",
+      "command": "python tools\\ai\\ai.py validate file --schema context-pack/v1 --input artifacts\\ai-runs\\example-low-risk\\context-pack.json",
+      "inputs": {
+        "schema": "context-pack/v1",
+        "input": "artifacts/ai-runs/example-low-risk/context-pack.json"
+      },
+      "outputs": [],
+      "dryRunSupported": true,
+      "validation": [
+        {
+          "name": "context-pack-schema",
+          "command": "python tools\\ai\\ai.py validate file --schema context-pack/v1 --input artifacts\\ai-runs\\example-low-risk\\context-pack.json"
+        }
+      ],
+      "requiresConfirmation": false
+    }
+  ]
+}

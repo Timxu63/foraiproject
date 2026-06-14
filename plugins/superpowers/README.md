@@ -155,7 +155,7 @@ already use it in another harness.
 
 1. **brainstorming** - Activates before writing code. Refines rough ideas through questions, explores alternatives, presents design in sections for validation. Saves design document.
 
-2. **using-git-worktrees** - Activates after design approval. Creates isolated workspace on new branch, runs project setup, verifies clean test baseline.
+2. **using-git-worktrees** - Activates after design approval. Asks for an explicit git-topology choice before creating or entering a worktree, then runs project setup and verifies a clean test baseline.
 
 3. **writing-plans** - Activates with approved design. Breaks work into bite-sized tasks (2-5 minutes each). Every task has exact file paths, complete code, verification steps.
 
@@ -187,7 +187,7 @@ already use it in another harness.
 - **dispatching-parallel-agents** - Concurrent subagent workflows
 - **requesting-code-review** - Pre-review checklist
 - **receiving-code-review** - Responding to feedback
-- **using-git-worktrees** - Parallel development branches
+- **using-git-worktrees** - Explicitly approved parallel development branches
 - **finishing-a-development-branch** - Merge/PR decision workflow
 - **subagent-driven-development** - Fast iteration with two-stage review (spec compliance, then code quality)
 
@@ -209,8 +209,8 @@ Read [the original release announcement](https://blog.fsck.com/2025/10/09/superp
 The general contribution process for Superpowers is below. Keep in mind that we don't generally accept contributions of new skills and that any updates to skills must work across all of the coding agents we support.
 
 1. Fork the repository
-2. Switch to the 'dev' branch
-3. Create a branch for your work
+2. Ask the maintainer which branch/worktree topology to use
+3. Switch or create a branch only after that explicit decision
 4. Follow the `writing-skills` skill for creating and testing new and modified skills
 5. Submit a PR, being sure to fill in the pull request template.
 

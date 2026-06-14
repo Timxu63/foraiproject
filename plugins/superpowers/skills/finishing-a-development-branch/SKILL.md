@@ -13,6 +13,12 @@ Guide completion of development work by presenting clear options and handling ch
 
 **Announce at start:** "I'm using the finishing-a-development-branch skill to complete this work."
 
+## Explicit User Decision Gate
+
+The option selected in Step 4 is the only authorization to switch branches, merge, push, remove worktrees, or delete branches. If the user has not selected one of the presented options, do not run `git checkout`, `git switch`, `git merge`, `git worktree remove`, `git branch -d`, or `git branch -D`.
+
+If the base branch, target branch, or worktree path is ambiguous, ask before taking action.
+
 ## The Process
 
 ### Step 1: Verify Tests
@@ -96,6 +102,8 @@ Which option?
 
 #### Option 1: Merge Locally
 
+Only run this after the user selects Option 1.
+
 ```bash
 # Get main repo root for CWD safety
 MAIN_ROOT=$(git -C "$(git rev-parse --git-common-dir)/.." rev-parse --show-toplevel)
@@ -119,6 +127,8 @@ git branch -d <feature-branch>
 ```
 
 #### Option 2: Push and Create PR
+
+Only run this after the user selects Option 2.
 
 ```bash
 # Push branch
@@ -235,6 +245,7 @@ git worktree prune  # Self-healing: clean up any stale registrations
 **Never:**
 - Proceed with failing tests
 - Merge without verifying tests on result
+- Switch branches without the user's explicit Step 4 option choice
 - Delete work without confirmation
 - Force-push without explicit request
 - Remove a worktree before confirming merge success

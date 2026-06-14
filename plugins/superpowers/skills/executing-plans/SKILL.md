@@ -21,6 +21,8 @@ Load plan, review critically, execute all tasks, report when complete.
 3. If concerns: Raise them with your human partner before starting
 4. If no concerns: Create TodoWrite and proceed
 
+Before using `superpowers:using-git-worktrees`, switching branches, or entering a parallel worktree, stop and get the user's explicit git-topology decision. Plan approval is not consent to change branches or create a worktree.
+
 ### Step 2: Execute Tasks
 
 For each task:
@@ -61,6 +63,7 @@ After all tasks complete and verified:
 - Reference skills when plan says to
 - Stop when blocked, don't guess
 - Never start implementation on main/master branch without explicit user consent
+- Never create, enter, remove, or switch a branch/worktree without explicit user choice in the current conversation
 
 ## Integration
 

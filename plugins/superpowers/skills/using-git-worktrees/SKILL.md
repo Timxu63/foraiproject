@@ -13,6 +13,33 @@ Ensure work happens in an isolated workspace. Prefer your platform's native work
 
 **Announce at start:** "I'm using the using-git-worktrees skill to set up an isolated workspace."
 
+## Explicit User Decision Gate
+
+Before any git-topology change, get an explicit user decision in the current conversation.
+
+Git-topology changes include:
+- Creating a new worktree.
+- Entering or handing off to a different worktree.
+- Running `git checkout` or `git switch`.
+- Creating, renaming, deleting, or force-deleting a branch.
+- Starting parallel work in separate worktrees.
+
+Do not infer this decision from:
+- "Implement this", "execute the plan", or similar task approval.
+- A plan that recommends isolation.
+- This skill saying worktrees are preferred.
+- Being on `main` or `master`.
+- An existing `.worktrees/` directory.
+- A prior conversation or remembered preference.
+
+Ask one concise question and wait. The answer must choose the git topology, for example:
+- Work in the current checkout.
+- Create a new worktree with a named branch.
+- Use an existing worktree or branch named by the user.
+- Switch to a named branch.
+
+If the user has not made that choice, keep working in the current checkout and do not mutate git topology.
+
 ## Step 0: Detect Existing Isolation
 
 **Before creating anything, check if you are already in an isolated workspace.**
@@ -38,11 +65,11 @@ Report with branch state:
 
 **If `GIT_DIR == GIT_COMMON` (or in a submodule):** You are in a normal repo checkout.
 
-Has the user already indicated their worktree preference in your instructions? If not, ask for consent before creating a worktree:
+Ask for an explicit user decision before creating a worktree or switching branches:
 
-> "Would you like me to set up an isolated worktree? It protects your current branch from changes."
+> "Do you want me to work in the current checkout, create a new worktree/branch, or use an existing branch/worktree? I will not change git topology without your choice."
 
-Honor any existing declared preference without asking. If the user declines consent, work in place and skip to Step 3.
+If the user chooses the current checkout, work in place and skip to Step 3. If the answer is ambiguous, ask again.
 
 ## Step 1: Create Isolated Workspace
 
@@ -50,7 +77,7 @@ Honor any existing declared preference without asking. If the user declines cons
 
 ### 1a. Native Worktree Tools (preferred)
 
-The user has asked for an isolated workspace (Step 0 consent). Do you already have a way to create a worktree? It might be a tool with a name like `EnterWorktree`, `WorktreeCreate`, a `/worktree` command, or a `--worktree` flag. If you do, use it and skip to Step 3.
+The user has explicitly chosen an isolated workspace in this conversation. Do you already have a way to create a worktree? It might be a tool with a name like `EnterWorktree`, `WorktreeCreate`, a `/worktree` command, or a `--worktree` flag. If you do, use it and skip to Step 3.
 
 Native tools handle directory placement, branch creation, and cleanup automatically. Using `git worktree add` when you have a native tool creates phantom state your harness can't see or manage.
 
@@ -62,9 +89,9 @@ Only proceed to Step 1b if you have no native worktree tool available.
 
 #### Directory Selection
 
-Follow this priority order. Explicit user preference always beats observed filesystem state.
+Follow this priority order after the user has explicitly chosen to create a worktree. Explicit user preference always beats observed filesystem state.
 
-1. **Check your instructions for a declared worktree directory preference.** If the user has already specified one, use it without asking.
+1. **Check the user's explicit git-topology decision for a declared worktree directory preference.** If the user specified one in that decision, use it.
 
 2. **Check for an existing project-local worktree directory:**
    ```bash
@@ -157,6 +184,7 @@ Ready to implement <feature-name>
 |-----------|--------|
 | Already in linked worktree | Skip creation (Step 0) |
 | In a submodule | Treat as normal repo (Step 0 guard) |
+| Need to create/switch branch or worktree | Ask for explicit user decision first |
 | Native worktree tool available | Use it (Step 1a) |
 | No native tool | Git worktree fallback (Step 1b) |
 | `.worktrees/` exists | Use it (verify ignored) |
@@ -200,6 +228,8 @@ Ready to implement <feature-name>
 
 **Never:**
 - Create a worktree when Step 0 detects existing isolation
+- Create, enter, or remove a worktree without an explicit user decision in the current conversation
+- Run `git checkout` or `git switch` without an explicit user decision in the current conversation
 - Use `git worktree add` when you have a native worktree tool (e.g., `EnterWorktree`). This is the #1 mistake — if you have it, use it.
 - Skip Step 1a by jumping straight to Step 1b's git commands
 - Create worktree without verifying it's ignored (project-local)
@@ -208,6 +238,7 @@ Ready to implement <feature-name>
 
 **Always:**
 - Run Step 0 detection first
+- Ask before changing git topology
 - Prefer native tools over git fallback
 - Follow directory priority: existing > global legacy > instruction file > default
 - Verify directory is ignored for project-local

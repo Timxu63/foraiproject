@@ -17,7 +17,7 @@
       "type": "array",
       "items": {
         "type": "object",
-        "required": ["id", "kind", "description", "target", "requiresConfirmation"],
+        "required": ["id", "kind", "description", "target", "command", "inputs", "outputs", "dryRunSupported", "validation", "requiresConfirmation"],
         "additionalProperties": false,
         "properties": {
           "id": {
@@ -33,6 +33,39 @@
           },
           "target": {
             "type": "string"
+          },
+          "command": {
+            "type": "string"
+          },
+          "inputs": {
+            "type": "object"
+          },
+          "outputs": {
+            "type": "array",
+            "items": {
+              "type": "string"
+            }
+          },
+          "dryRunSupported": {
+            "type": "boolean"
+          },
+          "validation": {
+            "type": "array",
+            "items": {
+              "type": "object",
+              "required": ["name", "command"],
+              "additionalProperties": false,
+              "properties": {
+                "name": {
+                  "type": "string",
+                  "minLength": 1
+                },
+                "command": {
+                  "type": "string",
+                  "minLength": 1
+                }
+              }
+            }
           },
           "requiresConfirmation": {
             "type": "boolean"

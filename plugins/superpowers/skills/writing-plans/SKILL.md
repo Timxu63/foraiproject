@@ -150,3 +150,5 @@ After saving the plan, offer execution choice:
 **If Inline Execution chosen:**
 - **REQUIRED SUB-SKILL:** Use superpowers:executing-plans
 - Batch execution with checkpoints for review
+
+Execution-mode choice does not authorize git-topology changes. The executing agent must separately ask before creating, entering, removing, or switching branches/worktrees, including parallel worktrees.

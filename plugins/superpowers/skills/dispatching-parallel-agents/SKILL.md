@@ -13,6 +13,8 @@ When you have multiple unrelated failures (different test files, different subsy
 
 **Core principle:** Dispatch one agent per independent problem domain. Let them work concurrently.
 
+**Git topology boundary:** Parallel agents are not permission to create or use parallel worktrees. If a task would create, enter, or assign separate worktrees or branches, ask the user for an explicit git-topology decision first. Without that decision, keep agents in the current checkout and ensure their write scopes do not conflict.
+
 ## When to Use
 
 ```dot
@@ -43,6 +45,7 @@ digraph when_to_use {
 - Failures are related (fix one might fix others)
 - Need to understand full system state
 - Agents would interfere with each other
+- Parallel work would require separate branches or worktrees and the user has not explicitly approved that topology
 
 ## The Pattern
 

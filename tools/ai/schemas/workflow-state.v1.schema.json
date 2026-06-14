@@ -1,0 +1,84 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://forai.local/schemas/workflow-state.v1.schema.json",
+  "title": "WorkflowStateV1",
+  "type": "object",
+  "required": ["version", "runId", "projectRoot", "status", "artifacts", "gates", "blockers"],
+  "additionalProperties": false,
+  "properties": {
+    "version": {
+      "const": "workflow-state/v1"
+    },
+    "runId": {
+      "type": "string",
+      "minLength": 1
+    },
+    "projectRoot": {
+      "type": "string",
+      "minLength": 1
+    },
+    "status": {
+      "enum": ["initialized", "running", "waiting_for_gate", "approved", "rejected", "blocked", "completed"]
+    },
+    "artifacts": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "required": ["name", "path", "producer", "schema", "validationStatus"],
+        "additionalProperties": false,
+        "properties": {
+          "name": {
+            "type": "string",
+            "minLength": 1
+          },
+          "path": {
+            "type": "string",
+            "minLength": 1
+          },
+          "producer": {
+            "type": "string",
+            "minLength": 1
+          },
+          "schema": {
+            "type": "string",
+            "minLength": 1
+          },
+          "validationStatus": {
+            "enum": ["passed", "failed", "blocked"]
+          },
+          "artifactRunId": {
+            "type": "string",
+            "minLength": 1
+          }
+        }
+      }
+    },
+    "gates": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "required": ["name", "status", "reason"],
+        "additionalProperties": false,
+        "properties": {
+          "name": {
+            "type": "string",
+            "minLength": 1
+          },
+          "status": {
+            "enum": ["pending", "approved", "rejected"]
+          },
+          "reason": {
+            "type": "string"
+          }
+        }
+      }
+    },
+    "blockers": {
+      "type": "array",
+      "items": {
+        "type": "string",
+        "minLength": 1
+      }
+    }
+  }
+}

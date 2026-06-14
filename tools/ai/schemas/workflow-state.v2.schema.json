@@ -1,0 +1,118 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://forai.local/schemas/workflow-state.v2.schema.json",
+  "title": "WorkflowStateV2",
+  "type": "object",
+  "required": ["version", "runId", "projectRoot", "profile", "intent", "phase", "status", "nextAction", "artifacts", "gates", "blockers", "startedAtUtc", "updatedAtUtc"],
+  "additionalProperties": false,
+  "properties": {
+    "version": {
+      "const": "workflow-state/v2"
+    },
+    "runId": {
+      "type": "string",
+      "minLength": 1
+    },
+    "projectRoot": {
+      "type": "string",
+      "minLength": 1
+    },
+    "profile": {
+      "enum": ["question", "plan", "change"]
+    },
+    "intent": {
+      "type": "string"
+    },
+    "phase": {
+      "enum": ["intent", "context", "requirements", "spec", "planning", "risk_review", "gate", "execute", "report", "blocked", "completed"]
+    },
+    "status": {
+      "enum": ["initialized", "running", "waiting_for_gate", "approved", "rejected", "blocked", "completed"]
+    },
+    "nextAction": {
+      "type": "object",
+      "required": ["kind", "command", "reason"],
+      "additionalProperties": false,
+      "properties": {
+        "kind": {
+          "enum": ["inspect", "intent_analysis", "context", "requirements", "spec", "plan", "risk_review", "gate", "execute", "report", "blocked", "done"]
+        },
+        "command": {
+          "type": "string"
+        },
+        "reason": {
+          "type": "string",
+          "minLength": 1
+        }
+      }
+    },
+    "artifacts": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "required": ["name", "path", "producer", "schema", "validationStatus"],
+        "additionalProperties": false,
+        "properties": {
+          "name": {
+            "type": "string",
+            "minLength": 1
+          },
+          "path": {
+            "type": "string",
+            "minLength": 1
+          },
+          "producer": {
+            "type": "string",
+            "minLength": 1
+          },
+          "schema": {
+            "type": "string",
+            "minLength": 1
+          },
+          "validationStatus": {
+            "enum": ["passed", "failed", "blocked"]
+          },
+          "artifactRunId": {
+            "type": "string",
+            "minLength": 1
+          }
+        }
+      }
+    },
+    "gates": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "required": ["name", "status", "reason"],
+        "additionalProperties": false,
+        "properties": {
+          "name": {
+            "type": "string",
+            "minLength": 1
+          },
+          "status": {
+            "enum": ["pending", "approved", "rejected"]
+          },
+          "reason": {
+            "type": "string"
+          }
+        }
+      }
+    },
+    "blockers": {
+      "type": "array",
+      "items": {
+        "type": "string",
+        "minLength": 1
+      }
+    },
+    "startedAtUtc": {
+      "type": "string",
+      "minLength": 1
+    },
+    "updatedAtUtc": {
+      "type": "string",
+      "minLength": 1
+    }
+  }
+}

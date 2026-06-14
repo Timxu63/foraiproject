@@ -3,7 +3,7 @@
   "$id": "https://forai.local/schemas/risk-review.v1.schema.json",
   "title": "RiskReviewV1",
   "type": "object",
-  "required": ["version", "runId", "overallRisk", "findings", "confirmationRequired"],
+  "required": ["version", "runId", "overallRisk", "findings", "confirmationRequired", "gateReason", "previewRequired", "previewArtifacts"],
   "additionalProperties": false,
   "properties": {
     "version": {
@@ -35,6 +35,19 @@
     },
     "confirmationRequired": {
       "type": "boolean"
+    },
+    "gateReason": {
+      "type": "string"
+    },
+    "previewRequired": {
+      "type": "boolean"
+    },
+    "previewArtifacts": {
+      "type": "array",
+      "items": {
+        "type": "string",
+        "minLength": 1
+      }
     }
   }
 }

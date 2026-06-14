@@ -71,3 +71,92 @@ User Intent
 - 稳定的 `--unity-id`
 
 如果无法明确目标，则阻止执行，直到用户选择目标。
+
+## 人工关卡 Agent 编排工作流
+
+适用于需要让 LLM 参与分析、规格、计划或报告，但执行必须由 CLI、人工 gate 和 Unity Editor Adapter 控制的任务。
+
+```text
+User Intent
+  -> LLM Artifact Draft
+  -> CLI Schema Validation
+  -> Context Pack
+  -> Execution Plan
+  -> Risk Review
+  -> Human Gate
+  -> Deterministic Execution
+  -> Unity Adapter when needed
+  -> Validation Report
+  -> Evidence Report
+```
+
+推荐命令顺序：
+
+```powershell
+python tools\ai\ai.py workflow begin --profile change --intent "<intent>" --run-id <run-id> --project-root "D:\foraiproject"
+python tools\ai\ai.py workflow attach-artifact --run-id <run-id> --name intent-analysis --schema intent-analysis/v1 --input <intent-analysis.json> --project-root "D:\foraiproject"
+python tools\ai\ai.py scan context --run-id <run-id> --project-root "D:\foraiproject"
+python tools\ai\ai.py workflow attach-artifact --run-id <run-id> --name requirement-check --schema requirement-check/v1 --input <requirement-check.json> --project-root "D:\foraiproject"
+python tools\ai\ai.py workflow attach-artifact --run-id <run-id> --name domain-spec --schema domain-spec/v1 --input <domain-spec.json> --project-root "D:\foraiproject"
+python tools\ai\ai.py risk review --run-id <run-id> --plan <execution-plan.json> --project-root "D:\foraiproject"
+python tools\ai\ai.py gate approve --run-id <run-id> --gate risk-review --reason "<reason>" --project-root "D:\foraiproject"
+python tools\ai\ai.py workflow preflight --run-id <run-id> --project-root "D:\foraiproject"
+python tools\ai\ai.py workflow status --run-id <run-id> --project-root "D:\foraiproject"
+```
+
+LLM 只能产出或修订 artifact；`SecurityCheck` 必须作为安全拦截处理，不得当作普通编译错误继续推进。
+
+## Universal Workflow Profiles
+
+所有 AI 请求先进入 `workflow begin`，再按 profile 推进：
+
+```text
+question:
+  Intent
+  -> Optional Context
+  -> Report
+  -> Complete
+
+plan:
+  Intent
+  -> Context Pack
+  -> Requirement Check
+  -> Domain Spec
+  -> Execution Plan
+  -> Risk Review
+  -> Report
+  -> Complete
+
+change:
+  Intent
+  -> Context Pack
+  -> Requirement Check
+  -> Domain Spec
+  -> Execution Plan
+  -> Risk Review
+  -> Dry Run or Diff Preview when required
+  -> Human Gate when required
+  -> Preflight
+  -> Execution
+  -> Validation
+  -> Report
+  -> Complete
+```
+
+推荐入口：
+
+```powershell
+python tools\ai\ai.py workflow begin --profile auto --intent "<intent>" --project-root "D:\foraiproject"
+python tools\ai\ai.py workflow next --run-id <run-id> --project-root "D:\foraiproject"
+python tools\ai\ai.py workflow attach-artifact --run-id <run-id> --name <artifact-name> --schema <schema-id> --input <artifact.json> --project-root "D:\foraiproject"
+```
+
+修改型执行前必须通过：
+
+```powershell
+python tools\ai\ai.py workflow preflight --run-id <run-id> --project-root "D:\foraiproject"
+```
+
+`workflow attach-artifact` 会校验 JSON schema、复制 artifact 到 `artifacts/ai-runs/<run-id>/`，并检查带 `runId` 的 artifact 是否匹配当前 workflow。`workflow next` 和 `workflow preflight` 会阻止缺失、schema 失败或 `runId` 不匹配的 artifact。
+
+`execution-plan/v1` 的每个 step 必须包含 `command`、`inputs`、`outputs`、`dryRunSupported` 和 `validation`。`risk-review/v1` 会声明 `gateReason`、`previewRequired` 和 `previewArtifacts`；当 `previewRequired` 为 `true` 时，preflight 必须看到对应 preview artifact 后才允许执行。
