@@ -1,0 +1,16 @@
+{
+  "name": "ForAI.Project.HotUpdate",
+  "rootNamespace": "ForAI.Project.HotUpdate",
+  "references": [
+    "ForAI.Project.Runtime"
+  ],
+  "includePlatforms": [],
+  "excludePlatforms": [],
+  "allowUnsafeCode": false,
+  "overrideReferences": false,
+  "precompiledReferences": [],
+  "autoReferenced": true,
+  "defineConstraints": [],
+  "versionDefines": [],
+  "noEngineReferences": false
+}

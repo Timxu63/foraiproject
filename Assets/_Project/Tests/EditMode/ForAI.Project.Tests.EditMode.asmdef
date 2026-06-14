@@ -1,0 +1,22 @@
+{
+  "name": "ForAI.Project.Tests.EditMode",
+  "rootNamespace": "ForAI.Project.Tests.EditMode",
+  "references": [
+    "ForAI.Project.Runtime",
+    "ForAI.Project.HotUpdate"
+  ],
+  "includePlatforms": [
+    "Editor"
+  ],
+  "excludePlatforms": [],
+  "allowUnsafeCode": false,
+  "overrideReferences": false,
+  "precompiledReferences": [],
+  "autoReferenced": true,
+  "defineConstraints": [],
+  "versionDefines": [],
+  "noEngineReferences": false,
+  "optionalUnityReferences": [
+    "TestAssemblies"
+  ]
+}
