@@ -1,0 +1,48 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://forai.local/schemas/skill-config.v1.schema.json",
+  "title": "SkillConfigV1",
+  "type": "object",
+  "required": ["version", "maxLinesPerEdit", "maxLinesPerProposal", "sampleThreshold", "validationSplit", "metricThresholds"],
+  "additionalProperties": false,
+  "properties": {
+    "version": {
+      "const": "skill-config/v1"
+    },
+    "maxLinesPerEdit": {
+      "type": "integer"
+    },
+    "maxLinesPerProposal": {
+      "type": "integer"
+    },
+    "sampleThreshold": {
+      "type": "object",
+      "required": ["minTotalRuns", "minKeywordOccurrences"],
+      "additionalProperties": false,
+      "properties": {
+        "minTotalRuns": {
+          "type": "integer"
+        },
+        "minKeywordOccurrences": {
+          "type": "integer"
+        }
+      }
+    },
+    "validationSplit": {
+      "type": "object",
+      "required": ["ratio", "seed"],
+      "additionalProperties": false,
+      "properties": {
+        "ratio": {
+          "type": "number"
+        },
+        "seed": {
+          "type": "integer"
+        }
+      }
+    },
+    "metricThresholds": {
+      "type": "object"
+    }
+  }
+}

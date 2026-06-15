@@ -1,0 +1,59 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://forai.local/schemas/skill-adoption-stage.v1.schema.json",
+  "title": "SkillAdoptionStageV1",
+  "type": "object",
+  "required": ["version", "runId", "stagedProposals"],
+  "additionalProperties": false,
+  "properties": {
+    "version": {
+      "const": "skill-adoption-stage/v1"
+    },
+    "runId": {
+      "type": "string",
+      "minLength": 1
+    },
+    "stagedProposals": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "required": ["proposalId", "targetPath", "diff", "expectedGain", "rationale", "anchorChecksum"],
+        "additionalProperties": false,
+        "properties": {
+          "proposalId": {
+            "type": "string",
+            "minLength": 1
+          },
+          "targetPath": {
+            "type": "string",
+            "minLength": 1
+          },
+          "diff": {
+            "type": "string"
+          },
+          "expectedGain": {
+            "type": "object",
+            "required": ["targetMetric", "delta"],
+            "additionalProperties": false,
+            "properties": {
+              "targetMetric": {
+                "type": "string",
+                "minLength": 1
+              },
+              "delta": {
+                "type": "number"
+              }
+            }
+          },
+          "rationale": {
+            "type": "string"
+          },
+          "anchorChecksum": {
+            "type": "string",
+            "minLength": 1
+          }
+        }
+      }
+    }
+  }
+}

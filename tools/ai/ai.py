@@ -14,6 +14,25 @@ from forai.paths import find_project_root
 from forai.risk import review_execution_plan
 from forai.scanner import scan_context_pack
 from forai.schemas import SchemaValidationError, load_schema, validate_payload
+from forai.skill_adoption import (
+    AdoptionError,
+    AdoptionStager,
+    build_decisions,
+    write_run_evidence,
+)
+from forai.skill_evaluator import HeldOutEvaluator
+from forai.skill_gates import GateRunner, decide
+from forai.skill_harvester import harvest
+from forai.skill_history import scan_run_histories
+from forai.skill_ledger import LedgerStore
+from forai.skill_metrics import MetricsEngine
+from forai.skill_models import (
+    AdoptionStage,
+    MetricsReport,
+    OptimizerConfig,
+    read_model,
+)
+from forai.skill_proposals import ProposalGenerator
 from forai.unity_gateway import gateway_status, run_compile_check, validation_report_from_compile
 from forai.workflow_engine import (
     WorkflowPreflightError,
@@ -360,6 +379,266 @@ def handle_unity_compile(args: argparse.Namespace) -> int:
     return 0 if report["status"] == "passed" else 1
 
 
+def _parse_window(value: str | None) -> tuple[str | None, str | None] | None:
+    """解析 ``--window`` 参数为 ``(from, to)`` 元组。
+
+    支持格式 ``<from>:<to>``（如 ``2026-05-01:2026-06-08``）。任一端可留空表示该端
+    无界（如 ``:2026-06-08`` 或 ``2026-05-01:``）。``value`` 为 None 时返回 None（不做
+    时间过滤）。
+    """
+    if value is None:
+        return None
+    if ":" not in value:
+        raise ValueError(
+            "Invalid --window format. Expected '<from>:<to>' (e.g. 2026-05-01:2026-06-08)."
+        )
+    start, end = value.split(":", 1)
+    start = start.strip() or None
+    end = end.strip() or None
+    return (start, end)
+
+
+def handle_skill_harvest(args: argparse.Namespace) -> int:
+    project_root = resolve_project_root(args.project_root)
+    run_dir = project_root / "artifacts" / "ai-runs" / args.run_id
+    if not run_dir.is_dir():
+        print_json(
+            {
+                "status": "failed",
+                "command": "skill harvest",
+                "runId": args.run_id,
+                "error": f"Run_History not found for runId {args.run_id!r}: {run_dir} does not exist.",
+            }
+        )
+        return 1
+
+    result = harvest(project_root, args.run_id)
+    progress = result.progress
+    payload: dict[str, Any] = {
+        "status": "passed",
+        "command": "skill harvest",
+        "runId": args.run_id,
+        "signal": result.signal.to_dict(),
+        "skipped": [item.to_dict() for item in result.skipped],
+    }
+    if progress is not None:
+        payload["progress"] = {
+            "totalRuns": progress.total_runs,
+            "categoryCounts": progress.category_counts,
+            "meetsMinTotalRuns": progress.meets_min_total_runs,
+            "hasRecurringKeyword": progress.has_recurring_keyword,
+            "thresholdMet": progress.threshold_met,
+        }
+    print_json(payload)
+    return 0
+
+
+def handle_skill_ledger(args: argparse.Namespace) -> int:
+    project_root = resolve_project_root(args.project_root)
+    config = OptimizerConfig.default()
+    store = LedgerStore(project_root=project_root)
+    store.load()
+    progress = store.progress(config.sample_threshold)
+
+    keyword_counts = {
+        term: stat.to_dict() for term, stat in progress.keyword_counts.items()
+    }
+    if args.category:
+        keyword_counts = {
+            term: stat
+            for term, stat in keyword_counts.items()
+            if stat.get("category") == args.category
+        }
+
+    payload: dict[str, Any] = {
+        "status": "passed",
+        "command": "skill ledger",
+        "totalRuns": progress.total_runs,
+        "categoryCounts": progress.category_counts,
+        "keywordCounts": keyword_counts,
+        "sampleThreshold": config.sample_threshold.to_dict(),
+        "progress": {
+            "meetsMinTotalRuns": progress.meets_min_total_runs,
+            "hasRecurringKeyword": progress.has_recurring_keyword,
+            "thresholdMet": progress.threshold_met,
+        },
+    }
+    if args.category:
+        payload["category"] = args.category
+    if progress.threshold_met:
+        payload["triggerCondition"] = "批量 Optimization_Run 已具备触发条件"
+    print_json(payload)
+    return 0
+
+
+def handle_skill_optimize(args: argparse.Namespace) -> int:
+    project_root = resolve_project_root(args.project_root)
+    run_id = args.run_id or default_run_id("skill-opt")
+    config = OptimizerConfig.default()
+    window = _parse_window(args.window)
+    seed = args.seed if args.seed is not None else config.validation_split.seed
+
+    scan = scan_run_histories(project_root, window=window)
+
+    engine = MetricsEngine()
+    metrics_report = engine.compute(scan, run_id=run_id)
+
+    # 可选：与上一次 skill-opt 运行的 metrics-report 对比，填充 deltaFromPrevious。
+    previous_report = _load_previous_metrics(project_root, run_id)
+    metrics_report = engine.diff_against(metrics_report, previous_report)
+
+    evaluator = HeldOutEvaluator(config)
+    training, validation = evaluator.split(scan.histories, seed=seed)
+
+    ledger = LedgerStore(project_root=project_root)
+    ledger.load()
+    training_run_ids = {history.run_id for history in training}
+    training_ledger = ledger.filtered_by_run_ids(training_run_ids)
+
+    generator = ProposalGenerator()
+    generate_result = generator.generate(metrics_report, training_ledger, config)
+    gate_runner = GateRunner()
+
+    decided: list = []
+    for proposal in generate_result.proposals:
+        evaluation = evaluator.evaluate(
+            proposal, validation, project_root=project_root
+        )
+        outcome = gate_runner.run(proposal, project_root=project_root)
+        decide(proposal, evaluation, outcome)
+        decided.append(proposal)
+
+    stager = AdoptionStager(project_root)
+    stage = stager.stage(decided, run_id=run_id)
+
+    rejected_proposals = [item.proposal for item in generate_result.rejected]
+    decisions = build_decisions(run_id, decided, rejected_proposals)
+    metrics_path, decisions_path = write_run_evidence(
+        project_root=project_root,
+        run_id=run_id,
+        metrics_report=metrics_report,
+        decisions=decisions,
+    )
+    stage_path = artifact_dir(project_root, run_id) / "adoption-stage.json"
+
+    accepted = sum(1 for p in decided if p.status == "accepted")
+    rejected = sum(1 for p in decided if p.status == "rejected") + len(
+        rejected_proposals
+    )
+    payload = {
+        "status": "passed",
+        "command": "skill optimize",
+        "runId": run_id,
+        "seed": seed,
+        "window": {"from": window[0], "to": window[1]} if window else None,
+        "includedRunCount": scan.included_run_count,
+        "skippedRunCount": scan.skipped_run_count,
+        "proposalCounts": {
+            "generated": len(generate_result.proposals),
+            "accepted": accepted,
+            "rejected": rejected,
+            "staged": len(stage.staged_proposals),
+        },
+        "evidence": {
+            "metricsReport": str(metrics_path),
+            "proposalDecisions": str(decisions_path),
+            "adoptionStage": str(stage_path),
+        },
+    }
+    print_json(payload)
+    return 0
+
+
+def handle_skill_proposals(args: argparse.Namespace) -> int:
+    project_root = resolve_project_root(args.project_root)
+    stage_path = artifact_dir(project_root, args.run_id) / "adoption-stage.json"
+    if not stage_path.exists():
+        print_json(
+            {
+                "status": "failed",
+                "command": "skill proposals",
+                "runId": args.run_id,
+                "error": (
+                    f"Adoption_Stage not found for runId {args.run_id!r}: "
+                    f"{stage_path} does not exist. Run 'skill optimize' first."
+                ),
+            }
+        )
+        return 1
+
+    stage: AdoptionStage = read_model(stage_path, AdoptionStage)  # type: ignore[assignment]
+    print_json(
+        {
+            "status": "passed",
+            "command": "skill proposals",
+            "runId": args.run_id,
+            "stagedProposals": [item.to_dict() for item in stage.staged_proposals],
+        }
+    )
+    return 0
+
+
+def handle_skill_adopt(args: argparse.Namespace) -> int:
+    project_root = resolve_project_root(args.project_root)
+    stager = AdoptionStager(project_root)
+    try:
+        result = stager.apply(
+            args.proposal_id,
+            run_id=args.run_id,
+            confirm=args.confirm,
+        )
+    except AdoptionError as exc:
+        print_json(
+            {
+                "status": "failed",
+                "command": "skill adopt",
+                "runId": args.run_id,
+                "proposalId": args.proposal_id,
+                "error": str(exc),
+            }
+        )
+        return 1
+
+    print_json(
+        {
+            "status": "passed",
+            "command": "skill adopt",
+            "runId": args.run_id,
+            "proposalId": result.proposal_id,
+            "applied": result.applied,
+            "path": result.path,
+            "message": result.message,
+        }
+    )
+    return 0
+
+
+def _load_previous_metrics(project_root: Path, current_run_id: str):
+    """查找上一次 ``skill-opt`` 运行的 metrics-report 以计算 deltaFromPrevious。
+
+    扫描 ``artifacts/ai-runs/`` 下名称以 ``skill-opt`` 开头、且不等于当前 run 的目录，
+    取按名称排序最大的（即最近的）一个的 ``metrics-report.json``。找不到时返回 None
+    （deltaFromPrevious 将为 None）。
+    """
+    runs_root = project_root / "artifacts" / "ai-runs"
+    if not runs_root.is_dir():
+        return None
+    candidates = sorted(
+        (
+            child
+            for child in runs_root.iterdir()
+            if child.is_dir()
+            and child.name.startswith("skill-opt")
+            and child.name != current_run_id
+            and (child / "metrics-report.json").is_file()
+        ),
+        key=lambda path: path.name,
+    )
+    if not candidates:
+        return None
+    return read_model(candidates[-1] / "metrics-report.json", MetricsReport)
+
+
 def build_parser() -> argparse.ArgumentParser:
     parser = argparse.ArgumentParser(description="ForAI deterministic AI workflow CLI")
     subparsers = parser.add_subparsers(dest="command", required=True)
@@ -476,6 +755,57 @@ def build_parser() -> argparse.ArgumentParser:
     unity_compile.add_argument("--timeout", type=int, default=180)
     unity_compile.add_argument("--run-id")
     unity_compile.set_defaults(handler=handle_unity_compile)
+
+    skill_parser = subparsers.add_parser(
+        "skill", help="Local skill optimization: harvest, ledger, optimize, adopt."
+    )
+    skill_subparsers = skill_parser.add_subparsers(dest="skill_command", required=True)
+
+    skill_harvest = skill_subparsers.add_parser(
+        "harvest", help="Read-only harvest of a single Run_History into Signal_Ledger."
+    )
+    skill_harvest.add_argument("--run-id", required=True)
+    skill_harvest.add_argument("--project-root")
+    skill_harvest.set_defaults(handler=handle_skill_harvest)
+
+    skill_ledger = skill_subparsers.add_parser(
+        "ledger", help="Show Signal_Ledger contents and Sample_Threshold progress."
+    )
+    skill_ledger.add_argument(
+        "--category",
+        choices=("steering_match", "capability_registry", "intent_classification"),
+        help="Optional Candidate_Keyword category to filter keyword counts.",
+    )
+    skill_ledger.add_argument("--project-root")
+    skill_ledger.set_defaults(handler=handle_skill_ledger)
+
+    skill_optimize = skill_subparsers.add_parser(
+        "optimize", help="Run a batch Optimization_Run and stage Edit_Proposals."
+    )
+    skill_optimize.add_argument("--run-id")
+    skill_optimize.add_argument("--seed", type=int)
+    skill_optimize.add_argument(
+        "--window",
+        help="Optional time window '<from>:<to>' (e.g. 2026-05-01:2026-06-08).",
+    )
+    skill_optimize.add_argument("--project-root")
+    skill_optimize.set_defaults(handler=handle_skill_optimize)
+
+    skill_proposals = skill_subparsers.add_parser(
+        "proposals", help="List staged Edit_Proposals awaiting adoption."
+    )
+    skill_proposals.add_argument("--run-id", required=True)
+    skill_proposals.add_argument("--project-root")
+    skill_proposals.set_defaults(handler=handle_skill_proposals)
+
+    skill_adopt = skill_subparsers.add_parser(
+        "adopt", help="Apply a staged Edit_Proposal after human confirmation."
+    )
+    skill_adopt.add_argument("--run-id", required=True)
+    skill_adopt.add_argument("--proposal-id", required=True)
+    skill_adopt.add_argument("--confirm", action="store_true")
+    skill_adopt.add_argument("--project-root")
+    skill_adopt.set_defaults(handler=handle_skill_adopt)
 
     return parser
 

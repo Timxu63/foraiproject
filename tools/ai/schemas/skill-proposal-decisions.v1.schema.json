@@ -1,0 +1,60 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://forai.local/schemas/skill-proposal-decisions.v1.schema.json",
+  "title": "SkillProposalDecisionsV1",
+  "type": "object",
+  "required": ["version", "runId", "decisions"],
+  "additionalProperties": false,
+  "properties": {
+    "version": {
+      "const": "skill-proposal-decisions/v1"
+    },
+    "runId": {
+      "type": "string",
+      "minLength": 1
+    },
+    "decisions": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "required": ["proposalId", "status", "reason"],
+        "additionalProperties": false,
+        "properties": {
+          "proposalId": {
+            "type": "string",
+            "minLength": 1
+          },
+          "status": {
+            "enum": ["accepted", "rejected", "skipped"]
+          },
+          "reason": {
+            "type": "string"
+          },
+          "targetPath": {
+            "type": "string"
+          },
+          "targetMetric": {
+            "type": "string"
+          },
+          "failedGates": {
+            "type": "array",
+            "items": {
+              "type": "object",
+              "required": ["gate", "output"],
+              "additionalProperties": false,
+              "properties": {
+                "gate": {
+                  "type": "string",
+                  "minLength": 1
+                },
+                "output": {
+                  "type": "string"
+                }
+              }
+            }
+          }
+        }
+      }
+    }
+  }
+}

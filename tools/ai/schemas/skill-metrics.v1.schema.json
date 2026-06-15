@@ -1,0 +1,68 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://forai.local/schemas/skill-metrics.v1.schema.json",
+  "title": "SkillMetricsV1",
+  "type": "object",
+  "required": ["version", "runId", "window", "includedRunCount", "skippedRunCount", "metrics"],
+  "additionalProperties": false,
+  "properties": {
+    "version": {
+      "const": "skill-metrics/v1"
+    },
+    "runId": {
+      "type": "string",
+      "minLength": 1
+    },
+    "window": {
+      "type": "object",
+      "required": ["from", "to"],
+      "additionalProperties": false,
+      "properties": {
+        "from": {
+          "type": "string"
+        },
+        "to": {
+          "type": "string"
+        }
+      }
+    },
+    "includedRunCount": {
+      "type": "integer"
+    },
+    "skippedRunCount": {
+      "type": "integer"
+    },
+    "metrics": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "required": ["id", "numerator", "denominator", "value", "status", "runIds"],
+        "additionalProperties": false,
+        "properties": {
+          "id": {
+            "type": "string",
+            "minLength": 1
+          },
+          "numerator": {
+            "type": "integer"
+          },
+          "denominator": {
+            "type": "integer"
+          },
+          "value": {},
+          "status": {
+            "enum": ["ok", "not_applicable"]
+          },
+          "runIds": {
+            "type": "array",
+            "items": {
+              "type": "string",
+              "minLength": 1
+            }
+          },
+          "deltaFromPrevious": {}
+        }
+      }
+    }
+  }
+}

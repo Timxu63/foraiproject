@@ -1,0 +1,71 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://forai.local/schemas/skill-signal.v1.schema.json",
+  "title": "SkillSignalV1",
+  "type": "object",
+  "required": ["version", "runId", "harvestedAt", "preflightFirstPass", "riskReviewBlocked", "clarificationRoundTrips", "candidateKeywords", "skipped"],
+  "additionalProperties": false,
+  "properties": {
+    "version": {
+      "const": "skill-signal/v1"
+    },
+    "runId": {
+      "type": "string",
+      "minLength": 1
+    },
+    "harvestedAt": {
+      "type": "string",
+      "minLength": 1
+    },
+    "profile": {
+      "type": "string"
+    },
+    "preflightFirstPass": {
+      "type": "boolean"
+    },
+    "riskReviewBlocked": {
+      "type": "boolean"
+    },
+    "clarificationRoundTrips": {
+      "type": "integer"
+    },
+    "candidateKeywords": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "required": ["term", "category"],
+        "additionalProperties": false,
+        "properties": {
+          "term": {
+            "type": "string",
+            "minLength": 1
+          },
+          "category": {
+            "enum": ["steering_match", "capability_registry", "intent_classification"]
+          },
+          "context": {
+            "type": "string"
+          }
+        }
+      }
+    },
+    "skipped": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "required": ["signal", "reason"],
+        "additionalProperties": false,
+        "properties": {
+          "signal": {
+            "type": "string",
+            "minLength": 1
+          },
+          "reason": {
+            "type": "string",
+            "minLength": 1
+          }
+        }
+      }
+    }
+  }
+}

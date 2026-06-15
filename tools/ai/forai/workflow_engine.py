@@ -7,6 +7,7 @@ from typing import Any
 from .artifacts import artifact_dir, normalize_run_id
 from .json_io import read_json
 from .schemas import SchemaValidationError, load_schema, validate_payload
+from .skill_harvester import harvest
 from .workflow_state import add_artifact, workflow_state_path
 
 
@@ -339,4 +340,27 @@ def complete_workflow(
     next_state["phase"] = "completed"
     next_state["nextAction"] = action("done", "none", "Workflow is completed.")
     next_state["updatedAtUtc"] = utc_now()
+
+    # Layer A — 只读 Harvest（local-skill-optimization, Requirements 10.1/10.6/10.9/10.10）。
+    # 工作流完成（含 postTaskExecution/agentStop hook 路径触发的 `workflow complete`）后，
+    # 对该单条 run-id 执行一次廉价、只读的信号采集并 append 到 Signal_Ledger。
+    #
+    # 仅 Layer A：不生成 Edit_Proposal、不运行任何 Deterministic_Gate、不修改任何
+    # Maintained_File，也不在未达 Sample_Threshold 时自动发起批量 Optimization_Run
+    # （Layer B 只由 `skill optimize` 显式/计划/达阈值触发）。
+    #
+    # 失败安全：harvest 是 best-effort 的旁路取证，任何异常都不得让 `workflow complete`
+    # 失败，故整体包裹在 try/except 中吞掉异常。
+    #
+    # 顺序说明：harvest 通过 forai.skill_harvester.harvest 从磁盘只读读取该 run 的产物
+    # （intent-analysis、risk-review、requirement-check 等，均已落盘）。此处刷新的
+    # workflow-state 由调用方（handle_workflow_complete）在本函数返回后才写盘，故 harvest
+    # 读到的可能是尚未刷新的 workflow-state；Harvester 对缺失/部分产物容错（记 skipped），
+    # 因此这一顺序是可接受的。harvest 不修改返回的 state（state 受 workflow-state/v2 schema
+    # 校验），仅作为副作用累积 Signal。
+    try:
+        harvest(project_root, str(next_state["runId"]))
+    except Exception:  # noqa: BLE001 - harvest 为 best-effort，绝不影响工作流完成
+        pass
+
     return next_state

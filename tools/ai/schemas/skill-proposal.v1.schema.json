@@ -1,0 +1,117 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://forai.local/schemas/skill-proposal.v1.schema.json",
+  "title": "SkillProposalV1",
+  "type": "object",
+  "required": ["version", "proposalId", "targetPath", "isMaintainedFile", "edits", "totalChangedLines", "targetMetric", "rationale", "status"],
+  "additionalProperties": false,
+  "properties": {
+    "version": {
+      "const": "skill-proposal/v1"
+    },
+    "proposalId": {
+      "type": "string",
+      "minLength": 1
+    },
+    "targetPath": {
+      "type": "string",
+      "minLength": 1
+    },
+    "isMaintainedFile": {
+      "type": "boolean"
+    },
+    "edits": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "required": ["type", "anchor", "newText", "changedLines"],
+        "additionalProperties": false,
+        "properties": {
+          "type": {
+            "enum": ["add", "delete", "replace"]
+          },
+          "anchor": {
+            "type": "string"
+          },
+          "newText": {
+            "type": "string"
+          },
+          "changedLines": {
+            "type": "integer"
+          }
+        }
+      }
+    },
+    "totalChangedLines": {
+      "type": "integer"
+    },
+    "keywordCategory": {
+      "enum": ["steering_match", "capability_registry", "intent_classification"]
+    },
+    "targetMetric": {
+      "type": "string",
+      "minLength": 1
+    },
+    "rationale": {
+      "type": "string"
+    },
+    "evidence": {
+      "type": "object",
+      "required": ["ledgerOccurrences", "thresholdMet"],
+      "additionalProperties": false,
+      "properties": {
+        "ledgerOccurrences": {
+          "type": "integer"
+        },
+        "thresholdMet": {
+          "type": "boolean"
+        }
+      }
+    },
+    "evaluation": {
+      "type": "object",
+      "required": ["validationDeltaBefore", "validationDeltaAfter", "strictlyImproved"],
+      "additionalProperties": false,
+      "properties": {
+        "validationDeltaBefore": {
+          "type": "number"
+        },
+        "validationDeltaAfter": {
+          "type": "number"
+        },
+        "strictlyImproved": {
+          "type": "boolean"
+        }
+      }
+    },
+    "gateResults": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "required": ["gate", "passed"],
+        "additionalProperties": false,
+        "properties": {
+          "gate": {
+            "type": "string",
+            "minLength": 1
+          },
+          "passed": {
+            "type": "boolean"
+          },
+          "status": {
+            "enum": ["passed", "failed", "not_applicable"]
+          },
+          "securityCheck": {
+            "type": "boolean"
+          },
+          "output": {
+            "type": "string"
+          }
+        }
+      }
+    },
+    "status": {
+      "enum": ["accepted", "rejected", "skipped"]
+    }
+  }
+}
