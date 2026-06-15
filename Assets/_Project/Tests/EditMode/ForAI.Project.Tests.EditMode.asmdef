@@ -3,7 +3,8 @@
   "rootNamespace": "ForAI.Project.Tests.EditMode",
   "references": [
     "ForAI.Project.Runtime",
-    "ForAI.Project.HotUpdate"
+    "ForAI.Project.HotUpdate",
+    "ForAI.Project.Editor.Addressables"
   ],
   "includePlatforms": [
     "Editor"
