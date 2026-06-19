@@ -58,7 +58,6 @@ namespace ForAI.Project.Tests.EditMode.Assets
                 "Assets/_Project/Content/Local/UI/Common/ForAI.Project.Content.asmdef",
                 "Assets/_Project/Content/Local/UI/Editor/EditorOnly.asset",
                 "Assets/_Project/Content/Local/Runtime/RuntimeOnly.asset",
-                "Assets/_Project/Content/Local/HotUpdate/HotUpdateOnly.asset",
                 "Assets/_Project/Content/Local/UI/Tests/TestOnly.asset",
                 "Assets/_Project/Runtime/UI/Core/UIPanelBase.cs",
                 "Assets/_Project/HotUpdate/Features/Inventory/UI/InventoryScreen.cs"

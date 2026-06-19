@@ -17,6 +17,7 @@ namespace ForAI.Project.Editor.Addressables
             AddressableContentPlanner.ScanRoot + "/Shared",
             AddressableContentPlanner.ScanRoot + "/UI",
             AddressableContentPlanner.ScanRoot + "/Config",
+            AddressableContentPlanner.ScanRoot + "/HotUpdate",
             AddressableContentPlanner.ScanRoot + "/Features"
         };
 
@@ -24,7 +25,8 @@ namespace ForAI.Project.Editor.Addressables
         {
             AddressableContentPlanner.GroupPrefix + "Shared",
             AddressableContentPlanner.GroupPrefix + "UI",
-            AddressableContentPlanner.GroupPrefix + "Config"
+            AddressableContentPlanner.GroupPrefix + "Config",
+            AddressableContentPlanner.GroupPrefix + "HotUpdate"
         };
 
         [MenuItem("ForAI/Addressables/Dry Run Local Content Sync")]
@@ -154,6 +156,7 @@ namespace ForAI.Project.Editor.Addressables
             EnsureFolder(AddressableContentPlanner.ScanRoot, "Shared");
             EnsureFolder(AddressableContentPlanner.ScanRoot, "UI");
             EnsureFolder(AddressableContentPlanner.ScanRoot, "Config");
+            EnsureFolder(AddressableContentPlanner.ScanRoot, "HotUpdate");
             EnsureFolder(AddressableContentPlanner.ScanRoot, "Features");
         }
 

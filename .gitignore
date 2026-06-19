@@ -1,13 +1,23 @@
 # Unity generated folders
-Library/
-Temp/
-Obj/
-Logs/
-UserSettings/
+/Library/
+/Temp/
+/Obj/
+/obj/
+/Logs/
+/UserSettings/
+/MemoryCaptures/
+/Recordings/
 
 # Unity build outputs
-Build/
-Builds/
+/Build/
+/Builds/
+/Builds-*/
+/BuildReports/
+/CrashReports/
+*.apk
+*.aab
+*.app
+*.unitypackage
 
 # Unity generated solution and project files
 *.csproj
@@ -23,11 +33,15 @@ Builds/
 *.mdb
 *.opendb
 *.VC.db
+*.pidb.meta
+*.pdb.meta
+*.mdb.meta
 
 # Unity crash and memory captures
 sysinfo.txt
 *.stackdump
-MemoryCaptures/
+*.dmp
+*.log
 
 # Rider and Visual Studio
 .idea/
@@ -44,6 +58,9 @@ __pycache__.meta
 .pytest_cache/
 .venv/
 venv/
+env/
+.env
+.env.*
 
 # Local Roslyn gateway execution scratch files
 tmp_do_code.csx
@@ -51,6 +68,9 @@ tmp_do_code.csx.meta
 
 # AI workflow artifacts
 artifacts/ai-runs/
+
+# HybridCLR local generated data
+/HybridCLRData/
 
 # Local worktrees
 .worktrees/

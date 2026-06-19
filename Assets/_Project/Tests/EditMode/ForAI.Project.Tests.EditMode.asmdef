@@ -4,7 +4,8 @@
   "references": [
     "ForAI.Project.Runtime",
     "ForAI.Project.HotUpdate",
-    "ForAI.Project.Editor.Addressables"
+    "ForAI.Project.Editor.Addressables",
+    "ForAI.Project.Editor.HybridCLR"
   ],
   "includePlatforms": [
     "Editor"

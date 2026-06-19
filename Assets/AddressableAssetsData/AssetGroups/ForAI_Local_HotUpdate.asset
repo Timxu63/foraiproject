@@ -1,0 +1,45 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: bbb281ee3bf0b054c82ac2347e9e782c, type: 3}
+  m_Name: ForAI_Local_HotUpdate
+  m_EditorClassIdentifier: 
+  m_GroupName: ForAI_Local_HotUpdate
+  m_Data:
+    m_SerializedData: []
+  m_GUID: b3241d7c2fb4d6e41a43ccbf10d96b81
+  m_SerializeEntries:
+  - m_GUID: 17af1acaa24d4194eb079d4559434854
+    m_Address: hot_update/windows/aot/mscorlib
+    m_ReadOnly: 0
+    m_SerializedLabels: []
+    FlaggedDuringContentUpdateRestriction: 0
+  - m_GUID: ed2d1714590e2e34d8f6cf77b39d7336
+    m_Address: hot_update/windows/aot/system
+    m_ReadOnly: 0
+    m_SerializedLabels: []
+    FlaggedDuringContentUpdateRestriction: 0
+  - m_GUID: 56f34fdabf13faf43ade793297bcd314
+    m_Address: hot_update/windows/aot/system
+    m_ReadOnly: 0
+    m_SerializedLabels: []
+    FlaggedDuringContentUpdateRestriction: 0
+  - m_GUID: a15b6020a1082dd4fbee136fc8f2583b
+    m_Address: hot_update/windows/for_ai_project
+    m_ReadOnly: 0
+    m_SerializedLabels: []
+    FlaggedDuringContentUpdateRestriction: 0
+  m_ReadOnly: 0
+  m_Settings: {fileID: 11400000, guid: daa52fb278a78444c8e3bc2c7caa40e0, type: 2}
+  m_SchemaSet:
+    m_Schemas:
+    - {fileID: 11400000, guid: 99adc1bffbd32d24d9d3648a5d297e85, type: 2}
+    - {fileID: 11400000, guid: 28d9a44c90bf32b4482daf70b98c0380, type: 2}

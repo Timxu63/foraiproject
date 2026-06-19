@@ -18,9 +18,9 @@ namespace ForAI.Project.Runtime.Update
 
         public string Message { get; }
 
-        public static HotUpdateLoadResult Success()
+        public static HotUpdateLoadResult Success(string message = "")
         {
-            return new HotUpdateLoadResult(true, HotUpdateLoadErrorKind.None, string.Empty);
+            return new HotUpdateLoadResult(true, HotUpdateLoadErrorKind.None, message ?? string.Empty);
         }
 
         public static HotUpdateLoadResult Failure(

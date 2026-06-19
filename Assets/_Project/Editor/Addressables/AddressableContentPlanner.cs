@@ -39,7 +39,6 @@ namespace ForAI.Project.Editor.Addressables
             new HashSet<string>(StringComparer.OrdinalIgnoreCase)
             {
                 "Editor",
-                "HotUpdate",
                 "Runtime",
                 "Tests"
             };
@@ -73,21 +72,23 @@ namespace ForAI.Project.Editor.Addressables
             {
                 address = "features/" + BuildAddress(segments.Skip(1).ToArray());
             }
+            else if (string.Equals(topLevel, "HotUpdate", StringComparison.OrdinalIgnoreCase) &&
+                segments.Length > 1)
+            {
+                address = "hot_update/" + BuildAddress(segments.Skip(1).ToArray());
+            }
 
             return new AddressableContentPlanEntry(assetPath, groupName, address);
         }
 
         private static string BuildAddress(string[] segments)
         {
-            return string.Join(
-                "/",
-                segments.Select((segment, index) =>
-                    NormalizeAddressSegment(segment, index == segments.Length - 1)));
+            return string.Join("/", segments.Select(NormalizeAddressSegment));
         }
 
-        private static string NormalizeAddressSegment(string segment, bool stripExtension)
+        private static string NormalizeAddressSegment(string segment)
         {
-            string withoutExtension = stripExtension ? Path.ChangeExtension(segment, null) : segment;
+            string withoutExtension = StripKnownAddressExtension(segment);
             var builder = new StringBuilder(withoutExtension.Length);
 
             for (int index = 0; index < withoutExtension.Length; index++)
@@ -108,6 +109,30 @@ namespace ForAI.Project.Editor.Addressables
             }
 
             return builder.ToString().Trim('_');
+        }
+
+        private static string StripKnownAddressExtension(string segment)
+        {
+            string value = segment;
+            if (value.EndsWith(".bytes", StringComparison.OrdinalIgnoreCase))
+            {
+                value = value.Substring(0, value.Length - ".bytes".Length);
+            }
+
+            bool strippedDllExtension = false;
+            if (value.EndsWith(".dll", StringComparison.OrdinalIgnoreCase))
+            {
+                value = value.Substring(0, value.Length - ".dll".Length);
+                strippedDllExtension = true;
+            }
+
+            if (strippedDllExtension)
+            {
+                return value;
+            }
+
+            string extension = Path.GetExtension(value);
+            return string.IsNullOrEmpty(extension) ? value : Path.ChangeExtension(value, null);
         }
 
         private static bool ShouldInsertWordSeparator(
@@ -151,6 +176,11 @@ namespace ForAI.Project.Editor.Addressables
             if (string.Equals(topLevel, "Config", StringComparison.OrdinalIgnoreCase))
             {
                 return GroupPrefix + "Config";
+            }
+
+            if (string.Equals(topLevel, "HotUpdate", StringComparison.OrdinalIgnoreCase))
+            {
+                return GroupPrefix + "HotUpdate";
             }
 
             if (string.Equals(topLevel, "Features", StringComparison.OrdinalIgnoreCase) &&

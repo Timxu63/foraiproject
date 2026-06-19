@@ -21,6 +21,8 @@ namespace ForAI.Project.Runtime.Boot
 
         public HybridClrUpdateService UpdateService { get; private set; }
 
+        public HotUpdateLoadResult LastHotUpdateLoadResult { get; private set; }
+
         private CancellationTokenSource _shutdownTokenSource;
 
         private async void Awake()
@@ -40,13 +42,25 @@ namespace ForAI.Project.Runtime.Boot
             var registry = new InMemoryUIPrefabRegistry();
             Transform root = uiRoot != null ? uiRoot : transform;
             UIManager = new UIManager(AssetService, registry, new UnityUIRoot(root));
-            UpdateService = new HybridClrUpdateService(AssetService, null);
+            UpdateService = new HybridClrUpdateService(AssetService, new HybridClrRuntimeLoader());
         }
 
-        public Task InitializeAsync(CancellationToken cancellationToken)
+        public async Task InitializeAsync(CancellationToken cancellationToken)
         {
-            // Addressables catalog update and HybridCLR assembly loading are gated by package setup.
-            return Task.CompletedTask;
+            LastHotUpdateLoadResult = await UpdateService.LoadHotUpdateAsync(
+                HotUpdateManifest.CreateWindowsStandaloneDefault(),
+                cancellationToken);
+
+            if (!LastHotUpdateLoadResult.IsSuccess)
+            {
+                Debug.LogWarning(LastHotUpdateLoadResult.Message);
+                return;
+            }
+
+            if (!string.IsNullOrWhiteSpace(LastHotUpdateLoadResult.Message))
+            {
+                Debug.Log($"HybridCLR hot update loaded: {LastHotUpdateLoadResult.Message}");
+            }
         }
 
         private void OnDestroy()

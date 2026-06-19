@@ -1,0 +1,20 @@
+{
+  "name": "ForAI.Project.Editor.HybridCLR",
+  "rootNamespace": "ForAI.Project.Editor.HybridCLR",
+  "references": [
+    "ForAI.Project.Editor.Addressables",
+    "Unity.Addressables.Editor",
+    "UnityEditor.TestRunner"
+  ],
+  "includePlatforms": [
+    "Editor"
+  ],
+  "excludePlatforms": [],
+  "allowUnsafeCode": false,
+  "overrideReferences": false,
+  "precompiledReferences": [],
+  "autoReferenced": true,
+  "defineConstraints": [],
+  "versionDefines": [],
+  "noEngineReferences": false
+}
