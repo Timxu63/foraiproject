@@ -21,7 +21,7 @@
 - Modify: `docs/ai/project-map.md`
   - 在文档地图中加入三个新入口文档。
 - Modify: `docs/ai/workflows.md`
-  - 增加“非工程用户需求澄清工作流”，声明问答结果仍必须进入 `Workflow Engine`。
+  - 增加“非工程用户需求澄清工作流”，声明请求一开始进入 workflow，问答和摘要记录在 workflow 内完成。
 
 ## 任务 1：创建用户指南
 
@@ -82,7 +82,7 @@ AI 会先判断你的任务类型：
 - 风险点。
 - 验收方式。
 
-你确认摘要后，AI 才能继续进入项目规定的 workflow。
+你的请求一开始就应进入项目规定的 workflow。需求澄清和摘要也在 workflow 内完成；你确认摘要后，AI 才能继续进入计划或修改执行阶段。
 
 ## 哪些操作需要特别确认
 
@@ -428,9 +428,10 @@ Expected: 提交成功，只包含 `docs/ai/acceptance-checklists.md`。
 2. AI 根据 `docs/ai/request-templates.md` 判断任务类型并逐步提问。
 3. 用户可以回答“不知道”；AI 给出安全默认建议，或说明为什么必须确认。
 4. AI 汇总需求摘要，包括目标、对象、路径、输入素材、默认处理、风险点和验收方式。
-5. 用户确认需求摘要后，AI 才能进入对应的 `question`、`plan` 或 `change` profile。
-6. 修改型任务仍必须经过 `risk review`、必要的人工 gate、`workflow preflight` 和验证。
-7. 执行完成后，AI 使用 `docs/ai/acceptance-checklists.md` 带用户验收。
+5. 需求澄清和摘要记录在对应的 `question` 或 `auto` workflow 内完成。
+6. 用户确认需求摘要后，AI 才能继续进入 `plan`、`change` profile 或修改执行阶段。
+7. 修改型任务仍必须经过 `risk review`、必要的人工 gate、`workflow preflight` 和验证。
+8. 执行完成后，AI 使用 `docs/ai/acceptance-checklists.md` 带用户验收。
 
 该工作流只降低表达门槛，不降低安全要求。
 ```
