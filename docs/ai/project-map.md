@@ -27,6 +27,12 @@ docs/
   superpowers/
 ```
 
+## 面向非工程用户的 AI 入口
+
+- `docs/ai/user-guide.md`：给策划、美术看的 AI 协作说明。
+- `docs/ai/request-templates.md`：AI 主动澄清需求时使用的分类型提问脚本。
+- `docs/ai/acceptance-checklists.md`：AI 执行完成后带用户验收的问答清单。
+
 ## 目标项目 Unity 结构
 
 ```text
