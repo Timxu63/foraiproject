@@ -30,10 +30,10 @@ QUESTION_BANK: dict[str, list[Question]] = {
         {
             "id": "ui.asset_source",
             "label": "素材来源",
-            "prompt": "按钮、图标、背景等素材来自现有项目、你提供的新图，还是需要先占位？",
+            "prompt": "按钮、图标、背景等素材来自现有项目、你提供的新图，还是需要先用临时素材？",
             "kind": "choice",
             "required": True,
-            "options": ["现有项目素材", "提供新素材", "先用占位"],
+            "options": ["现有项目素材", "提供新素材", "先用临时素材"],
         },
         {
             "id": "ui.interaction",
