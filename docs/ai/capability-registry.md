@@ -97,6 +97,25 @@ MCP 可以在 CLI 和 schemas 稳定后包装 CLI。MCP tools 必须保留与 CL
 
 ## 确定性 AI CLI
 
+### Request Guide
+
+入口：
+
+- `python tools\ai\ai.py request guide`
+
+允许：
+
+- 根据用户一句话意图输出 `request-guide/v1`。
+- 给出 `taskType`、`workflowProfileHint`、最多 3 个澄清问题、安全默认值和需求摘要。
+- 读取可选的 `request-guide-answers/v1`，跳过已回答字段，继续下一轮提问。
+- 帮助 AI 在明确需求过程中主动形成提问行程，而不是要求策划、美术先整理完整需求文档。
+
+禁止：
+
+- 创建或推进 workflow state。
+- 修改 Unity 资产、场景、Prefab、ProjectSettings 或编辑器状态。
+- 替代 `workflow begin`、`risk review`、`workflow preflight`、人工 gate 或 Unity Editor Adapter。
+
 ### Workflow State
 
 入口：
