@@ -282,6 +282,94 @@ def test_requirements_spec_and_plan_validate_commands(tmp_path: Path):
     assert parse_stdout(plan_result)["status"] == "passed"
 
 
+def test_request_guide_command_outputs_clarification_payload():
+    root = find_project_root()
+    completed = run_cli(
+        "request",
+        "guide",
+        "--intent",
+        "我想做一个背包界面",
+        "--run-id",
+        "question-cli",
+        "--project-root",
+        str(root),
+    )
+
+    assert completed.returncode == 0, completed.stderr
+    payload = parse_stdout(completed)
+    assert payload["version"] == "request-guide/v1"
+    assert payload["runId"] == "question-cli"
+    assert payload["taskType"] == "ui"
+    assert payload["status"] == "needs_clarification"
+    assert len(payload["questions"]) == 3
+
+
+def test_request_guide_command_accepts_answers_file(tmp_path: Path):
+    root = find_project_root()
+    answers = write_json(
+        tmp_path / "answers.json",
+        {
+            "version": "request-guide-answers/v1",
+            "runId": "question-cli",
+            "answers": {
+                "ui.target": "玩家查看和整理道具",
+                "ui.reference": "参考现有商城界面",
+            },
+        },
+    )
+
+    completed = run_cli(
+        "request",
+        "guide",
+        "--intent",
+        "我想做一个背包界面",
+        "--answers",
+        str(answers),
+        "--run-id",
+        "question-cli",
+        "--project-root",
+        str(root),
+    )
+
+    assert completed.returncode == 0, completed.stderr
+    payload = parse_stdout(completed)
+    assert payload["known"]["ui.target"] == "玩家查看和整理道具"
+    question_ids = [question["id"] for question in payload["questions"]]
+    assert "ui.target" not in question_ids
+    assert "ui.reference" not in question_ids
+    assert question_ids[0] == "ui.asset_source"
+
+
+def test_request_guide_command_rejects_answers_run_id_mismatch(tmp_path: Path):
+    root = find_project_root()
+    answers = write_json(
+        tmp_path / "answers.json",
+        {
+            "version": "request-guide-answers/v1",
+            "runId": "other-run",
+            "answers": {"ui.target": "背包界面"},
+        },
+    )
+
+    completed = run_cli(
+        "request",
+        "guide",
+        "--intent",
+        "我想做一个背包界面",
+        "--answers",
+        str(answers),
+        "--run-id",
+        "question-cli",
+        "--project-root",
+        str(root),
+    )
+
+    assert completed.returncode == 1
+    payload = parse_stdout(completed)
+    assert payload["status"] == "failed"
+    assert "runId mismatch" in payload["error"]
+
+
 def test_risk_review_uses_workflow_run_id_when_provided(tmp_path: Path):
     root = find_project_root()
     plan = tmp_path / "execution-plan.json"

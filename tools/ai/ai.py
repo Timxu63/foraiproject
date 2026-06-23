@@ -11,6 +11,7 @@ from typing import Any
 from forai.artifacts import artifact_dir, normalize_run_id
 from forai.json_io import read_json, write_json
 from forai.paths import find_project_root
+from forai.request_guide import build_request_guide, validate_answers_run_id
 from forai.risk import review_execution_plan
 from forai.scanner import scan_context_pack
 from forai.schemas import SchemaValidationError, load_schema, validate_payload
@@ -225,6 +226,21 @@ def handle_requirements_check(args: argparse.Namespace) -> int:
             "blockers": payload["blockers"],
         }
     )
+    return 0
+
+
+def handle_request_guide(args: argparse.Namespace) -> int:
+    project_root = resolve_project_root(args.project_root)
+    answers: dict[str, Any] = {}
+    if args.answers:
+        answers_payload = read_json(Path(args.answers))
+        validate_or_exit(project_root, "request-guide-answers/v1", answers_payload)
+        validate_answers_run_id(answers_payload, args.run_id)
+        answers = dict(answers_payload.get("answers", {}))
+
+    payload = build_request_guide(args.intent, answers=answers, run_id=args.run_id)
+    validate_or_exit(project_root, "request-guide/v1", payload)
+    print_json(payload)
     return 0
 
 
@@ -699,6 +715,15 @@ def build_parser() -> argparse.ArgumentParser:
     requirements_check.add_argument("--input", required=True)
     requirements_check.add_argument("--project-root")
     requirements_check.set_defaults(handler=handle_requirements_check)
+
+    request_parser = subparsers.add_parser("request", help="Guide non-engineering AI request clarification.")
+    request_subparsers = request_parser.add_subparsers(dest="request_command", required=True)
+    request_guide = request_subparsers.add_parser("guide", help="Return clarification questions for a user intent.")
+    request_guide.add_argument("--intent", required=True)
+    request_guide.add_argument("--answers")
+    request_guide.add_argument("--run-id")
+    request_guide.add_argument("--project-root")
+    request_guide.set_defaults(handler=handle_request_guide)
 
     spec_parser = subparsers.add_parser("spec", help="Validate domain specs.")
     spec_subparsers = spec_parser.add_subparsers(dest="spec_command", required=True)
