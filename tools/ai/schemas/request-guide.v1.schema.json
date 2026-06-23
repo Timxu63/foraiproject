@@ -1,0 +1,112 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://forai.local/schemas/request-guide.v1.schema.json",
+  "title": "RequestGuideV1",
+  "type": "object",
+  "required": [
+    "version",
+    "intent",
+    "taskType",
+    "status",
+    "workflowProfileHint",
+    "known",
+    "unknowns",
+    "questions",
+    "safeDefaults",
+    "summary",
+    "nextAction"
+  ],
+  "additionalProperties": false,
+  "properties": {
+    "version": {
+      "const": "request-guide/v1"
+    },
+    "runId": {
+      "type": "string",
+      "minLength": 1
+    },
+    "intent": {
+      "type": "string"
+    },
+    "taskType": {
+      "enum": ["ui", "bug", "prefab", "art", "scene", "system", "unknown"]
+    },
+    "status": {
+      "enum": ["needs_clarification", "defaultable", "ready", "blocked"]
+    },
+    "workflowProfileHint": {
+      "enum": ["question", "plan", "change"]
+    },
+    "known": {
+      "type": "object"
+    },
+    "unknowns": {
+      "type": "array",
+      "items": {
+        "type": "string",
+        "minLength": 1
+      }
+    },
+    "questions": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "required": ["id", "label", "prompt", "kind", "required", "options"],
+        "additionalProperties": false,
+        "properties": {
+          "id": {
+            "type": "string",
+            "minLength": 1
+          },
+          "label": {
+            "type": "string",
+            "minLength": 1
+          },
+          "prompt": {
+            "type": "string",
+            "minLength": 1
+          },
+          "kind": {
+            "enum": ["text", "choice", "multiline", "path"]
+          },
+          "required": {
+            "type": "boolean"
+          },
+          "options": {
+            "type": "array",
+            "items": {
+              "type": "string"
+            }
+          }
+        }
+      }
+    },
+    "safeDefaults": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "required": ["field", "value", "reason"],
+        "additionalProperties": false,
+        "properties": {
+          "field": {
+            "type": "string",
+            "minLength": 1
+          },
+          "value": {
+            "type": "string"
+          },
+          "reason": {
+            "type": "string",
+            "minLength": 1
+          }
+        }
+      }
+    },
+    "summary": {
+      "type": "object"
+    },
+    "nextAction": {
+      "enum": ["ask_user", "begin_workflow", "revise_request"]
+    }
+  }
+}

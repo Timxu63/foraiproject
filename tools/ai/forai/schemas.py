@@ -13,6 +13,8 @@ SCHEMA_FILE_BY_ID = {
     "execution-plan/v1": "execution-plan.v1.schema.json",
     "intent-analysis/v1": "intent-analysis.v1.schema.json",
     "requirement-check/v1": "requirement-check.v1.schema.json",
+    "request-guide/v1": "request-guide.v1.schema.json",
+    "request-guide-answers/v1": "request-guide-answers.v1.schema.json",
     "risk-review/v1": "risk-review.v1.schema.json",
     "skill-signal/v1": "skill-signal.v1.schema.json",
     "skill-ledger/v1": "skill-ledger.v1.schema.json",

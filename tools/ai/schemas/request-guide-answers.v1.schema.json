@@ -1,0 +1,20 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://forai.local/schemas/request-guide-answers.v1.schema.json",
+  "title": "RequestGuideAnswersV1",
+  "type": "object",
+  "required": ["version", "answers"],
+  "additionalProperties": false,
+  "properties": {
+    "version": {
+      "const": "request-guide-answers/v1"
+    },
+    "runId": {
+      "type": "string",
+      "minLength": 1
+    },
+    "answers": {
+      "type": "object"
+    }
+  }
+}

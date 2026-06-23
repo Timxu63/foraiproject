@@ -128,3 +128,73 @@ def test_validate_risk_review_accepts_preview_contract_fields():
         "previewArtifacts": ["dry-run-preview"],
     }
     validate_payload(schema, payload)
+
+
+def test_validate_request_guide_accepts_question_payload():
+    root = find_project_root()
+    schema = load_schema(root, "request-guide/v1")
+    payload = {
+        "version": "request-guide/v1",
+        "runId": "question-123",
+        "intent": "我想做一个背包界面",
+        "taskType": "ui",
+        "status": "needs_clarification",
+        "workflowProfileHint": "question",
+        "known": {},
+        "unknowns": ["ui.target"],
+        "questions": [
+            {
+                "id": "ui.target",
+                "label": "目标界面",
+                "prompt": "这个界面给玩家完成什么操作？",
+                "kind": "text",
+                "required": True,
+                "options": [],
+            }
+        ],
+        "safeDefaults": [
+            {
+                "field": "ui.implementation",
+                "value": "UGUI",
+                "reason": "当前项目已启用 com.unity.ugui。",
+            }
+        ],
+        "summary": {"ready": False},
+        "nextAction": "ask_user",
+    }
+    validate_payload(schema, payload)
+
+
+def test_validate_request_guide_rejects_extra_property():
+    root = find_project_root()
+    schema = load_schema(root, "request-guide/v1")
+    payload = {
+        "version": "request-guide/v1",
+        "intent": "帮我处理一下",
+        "taskType": "unknown",
+        "status": "blocked",
+        "workflowProfileHint": "question",
+        "known": {},
+        "unknowns": ["intent"],
+        "questions": [],
+        "safeDefaults": [],
+        "summary": {},
+        "nextAction": "revise_request",
+        "extra": True,
+    }
+    with pytest.raises(SchemaValidationError):
+        validate_payload(schema, payload)
+
+
+def test_validate_request_guide_answers_accepts_answer_payload():
+    root = find_project_root()
+    schema = load_schema(root, "request-guide-answers/v1")
+    payload = {
+        "version": "request-guide-answers/v1",
+        "runId": "question-123",
+        "answers": {
+            "ui.target": "背包界面",
+            "ui.reference": "参考现有商城界面",
+        },
+    }
+    validate_payload(schema, payload)
